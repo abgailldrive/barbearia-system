@@ -5,7 +5,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { generateTimeSlots, formatDate, getDayName } from '../utils/dateUtils';
 
 export default function Booking() {
-    const { services, appointments, addAppointment, getBusyTimesByDate, getAppointmentsByClient, cancelAppointment } = useData();
+    const { services, appointments, addAppointment, getBusyTimesByDate, getAppointmentsByClient, cancelAppointment, workingHours } = useData();
     const { user, logout } = useAuth();
     const navigate = useNavigate();
 
@@ -23,10 +23,10 @@ export default function Booking() {
         if (selectedService && selectedDate) {
             // Use busy_times view data for availability
             const dayBusySlots = getBusyTimesByDate(selectedDate);
-            const slots = generateTimeSlots(selectedDate, dayBusySlots, selectedService.duration);
+            const slots = generateTimeSlots(selectedDate, dayBusySlots, selectedService.duration, workingHours);
             setAvailableSlots(slots);
         }
-    }, [selectedService, selectedDate, appointments]);
+    }, [selectedService, selectedDate, appointments, workingHours]);
 
     const handleServiceSelect = (service) => {
         setSelectedService(service);

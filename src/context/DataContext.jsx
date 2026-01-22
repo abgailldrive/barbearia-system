@@ -10,6 +10,7 @@ export const DataProvider = ({ children }) => {
     const [appointments, setAppointments] = useState([]);
     const [busySlots, setBusySlots] = useState([]); // View from 'public.busy_times'
     const [notifications, setNotifications] = useState([]);
+    const [workingHours, setWorkingHours] = useState([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -31,6 +32,11 @@ export const DataProvider = ({ children }) => {
             .on('postgres_changes', { event: '*', schema: 'public', table: 'notifications' }, handleNotificationChange)
             .subscribe();
 
+        const workingHoursSub = supabase
+            .channel('public:working_hours')
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'working_hours' }, fetchData)
+            .subscribe();
+
         // We can't sub to Views directly usually, but if the underlying table changes, we might want to refresh.
         // Since we refresh ALL data on any change to appointments table, busySlots will update too.
         // So the appointmentsSub handles it.
@@ -39,6 +45,7 @@ export const DataProvider = ({ children }) => {
             supabase.removeChannel(servicesSub);
             supabase.removeChannel(appointmentsSub);
             supabase.removeChannel(notificationsSub);
+            supabase.removeChannel(workingHoursSub);
         };
     }, []);
 
@@ -65,6 +72,10 @@ export const DataProvider = ({ children }) => {
 
             if (notifData) setNotifications(notifData);
 
+            // Fetch Working Hours
+            const { data: hoursData } = await supabase.from('working_hours').select('*').order('day_of_week');
+            if (hoursData) setWorkingHours(hoursData);
+
         } catch (error) {
             console.error("Error fetching data:", error);
         } finally {
@@ -83,6 +94,13 @@ export const DataProvider = ({ children }) => {
         const { error } = await supabase.from('notifications').update({ read: true }).eq('id', id);
         if (!error) {
             setNotifications(prev => prev.filter(n => n.id !== id));
+        }
+    };
+
+    const updateWorkingHours = async (updatedHour) => {
+        const { error } = await supabase.from('working_hours').update(updatedHour).eq('id', updatedHour.id);
+        if (!error) {
+            setWorkingHours(workingHours.map(h => h.id === updatedHour.id ? updatedHour : h));
         }
     };
 
@@ -152,6 +170,7 @@ export const DataProvider = ({ children }) => {
             appointments,
             busySlots,
             notifications,
+            workingHours,
             loading,
             addService,
             updateService,
@@ -159,6 +178,7 @@ export const DataProvider = ({ children }) => {
             addAppointment,
             cancelAppointment,
             markNotificationAsRead,
+            updateWorkingHours,
             getAppointmentsByDate,
             getBusyTimesByDate,
             getAppointmentsByClient

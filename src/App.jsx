@@ -6,6 +6,8 @@ import Dashboard from './pages/Dashboard';
 import Booking from './pages/Booking';
 import Profile from './pages/Profile';
 import Services from './pages/Services';
+import WorkingHoursSettings from './pages/WorkingHoursSettings';
+import AppointmentHistory from './pages/AppointmentHistory';
 import { useAuth } from './context/AuthContext';
 
 function PrivateRoute({ children, allowedRoles }) {
@@ -54,6 +56,16 @@ function App() {
       <Route path="/services" element={
         <PrivateRoute allowedRoles={['barber', 'admin']}>
           <Services />
+        </PrivateRoute>
+      } />
+      <Route path="/working-hours" element={
+        <PrivateRoute allowedRoles={['barber', 'admin']}>
+          <WorkingHoursSettings />
+        </PrivateRoute>
+      } />
+      <Route path="/history" element={
+        <PrivateRoute allowedRoles={['barber', 'admin']}>
+          <AppointmentHistory />
         </PrivateRoute>
       } />
     </Routes>

@@ -33,7 +33,8 @@ export default function Register() {
 
     return (
         <div className="container" style={{ maxWidth: '400px', marginTop: '2rem' }}>
-            <div className="card fade-in">
+            <div className="card fade-in" style={{ textAlign: 'center' }}>
+                <img src="/logo.jpg" alt="Logo" style={{ maxWidth: '150px', marginBottom: '1rem', borderRadius: '50%' }} />
                 <h2 style={{ marginBottom: '1.5rem', textAlign: 'center' }}>Criar Conta</h2>
 
                 {error && <div style={{ color: 'var(--danger)', marginBottom: '1rem', textAlign: 'center' }}>{error}</div>}

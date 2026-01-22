@@ -42,7 +42,10 @@ export default function Dashboard() {
     return (
         <div className="container fade-in">
             <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-                <h1>Painel do Barbeiro</h1>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                    <img src="/logo.jpg" alt="Logo" style={{ height: '50px', borderRadius: '50%' }} />
+                    <h1>Painel do Barbeiro</h1>
+                </div>
                 <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
                     <NotificationBell />
                     <Link to="/profile" style={{ color: 'var(--text-primary)', textDecoration: 'none' }}>
@@ -78,8 +81,10 @@ export default function Dashboard() {
                 </div>
                 <div className="card">
                     <h3>Ações Rápidas</h3>
-                    <div style={{ display: 'flex', gap: '1rem', marginTop: '0.5rem' }}>
+                    <div style={{ display: 'flex', gap: '1rem', marginTop: '0.5rem', flexWrap: 'wrap' }}>
                         <Link to="/services" className="btn btn-secondary btn-full">Gerenciar Serviços</Link>
+                        <Link to="/working-hours" className="btn btn-secondary btn-full">Configurar Horários</Link>
+                        <Link to="/history" className="btn btn-secondary btn-full">Histórico</Link>
                     </div>
                 </div>
             </div>

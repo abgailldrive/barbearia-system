@@ -1,18 +1,42 @@
-export const START_HOUR = 9; // 9 AM
-export const END_HOUR = 19; // 7 PM
+export const START_HOUR = 9; // Fallback
+export const END_HOUR = 19; // Fallback
 export const SLOT_INTERVAL = 30; // 30 mins
 
-export const generateTimeSlots = (dateStr, appointments = [], duration = 30) => {
+export const generateTimeSlots = (dateStr, appointments = [], duration = 30, workingHours = []) => {
     // dateStr: YYYY-MM-DD
     const slots = [];
     const date = new Date(dateStr + 'T00:00:00');
+    const dayOfWeek = date.getDay(); // 0 = Sunday
 
-    // Start at START_HOUR
+    // Find config for this day
+    const dayConfig = workingHours.find(h => h.day_of_week === dayOfWeek);
+
+    // If day is closed, return empty
+    if (dayConfig && dayConfig.is_closed) {
+        return [];
+    }
+
+    let startH = START_HOUR;
+    let startM = 0;
+    let endH = END_HOUR;
+    let endM = 0;
+
+    if (dayConfig) {
+        // Parse "09:00:00"
+        const [sH, sM] = dayConfig.start_time.split(':').map(Number);
+        const [eH, eM] = dayConfig.end_time.split(':').map(Number);
+        startH = sH;
+        startM = sM;
+        endH = eH;
+        endM = eM;
+    }
+
+    // Start
     let current = new Date(date);
-    current.setHours(START_HOUR, 0, 0, 0);
+    current.setHours(startH, startM, 0, 0);
 
     const end = new Date(date);
-    end.setHours(END_HOUR, 0, 0, 0);
+    end.setHours(endH, endM, 0, 0);
 
     while (current < end) {
         const timeString = current.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -36,9 +60,7 @@ export const generateTimeSlots = (dateStr, appointments = [], duration = 30) => 
             slots.push(timeString);
         }
 
-        // Increment by step (e.g. 15 or 30 mins) - for now using standard 30 min step for grid
-        // BUT logic suggests "Smart Scheduling" means calculating gaps.
-        // Let's increment by 30 mins for simplicity of the grid for now.
+        // Increment
         current.setMinutes(current.getMinutes() + 30);
     }
 
